@@ -1,8 +1,12 @@
 <?php
 namespace Aura\SqlSchema;
 
-abstract class AbstractSchemaTest extends \PHPUnit_Framework_TestCase
+use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+
+abstract class AbstractSchemaTest extends PHPUnit_Framework_TestCase
 {
+    public $setup;
+    public $expect_fetch_table_list_schema;
     protected $extension;
 
     protected $pdo_type;
@@ -15,7 +19,7 @@ abstract class AbstractSchemaTest extends \PHPUnit_Framework_TestCase
 
     protected $expect_quote_name = '"one"."two"';
 
-    public function setUp()
+    protected function setUp(): void
     {
         // skip if we don't have the extension
         if (! extension_loaded($this->extension)) {
@@ -37,37 +41,37 @@ abstract class AbstractSchemaTest extends \PHPUnit_Framework_TestCase
         }
 
         // database setup
-        $setup_class = 'Aura\SqlSchema\Setup\\' . ucfirst($this->pdo_type) . 'Setup';
+        $setup_class = 'Aura\SqlSchema\Setup\\' . ucfirst((string) $this->pdo_type) . 'Setup';
         $this->setup = new $setup_class;
 
         // schema class same as this class, minus "Test"
-        $class = substr(get_class($this), 0, -4);
+        $class = substr(static::class, 0, -4);
         $this->schema = new $class(
             $this->setup->getPdo(),
             new ColumnFactory
         );
     }
 
-    public function testGetColumnFactory()
+    public function testGetColumnFactory(): void
     {
         $actual = $this->schema->getColumnFactory();
-        $this->assertInstanceOf('\Aura\SqlSchema\ColumnFactory', $actual);
+        $this->assertInstanceOf(\Aura\SqlSchema\ColumnFactory::class, $actual);
     }
 
-    public function testFetchTableList()
+    public function testFetchTableList(): void
     {
         $actual = $this->schema->fetchTableList();
         $this->assertEquals($this->expect_fetch_table_list, $actual);
     }
 
-    public function testFetchTableList_schema()
+    public function testFetchTableList_schema(): void
     {
         $schema2 = $this->setup->getSchema2();
         $actual = $this->schema->fetchTableList($schema2);
         $this->assertEquals($this->expect_fetch_table_list_schema, $actual);
     }
 
-    public function testFetchTableCols()
+    public function testFetchTableCols(): void
     {
         $table  = $this->setup->getTable();
         $actual = $this->schema->fetchTableCols($table);
@@ -80,7 +84,7 @@ abstract class AbstractSchemaTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testFetchTableCols_schema()
+    public function testFetchTableCols_schema(): void
     {
         $table  = $this->setup->getTable();
         $schema2 = $this->setup->getSchema2();
@@ -94,7 +98,7 @@ abstract class AbstractSchemaTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testQuoteName()
+    public function testQuoteName(): void
     {
         $actual = $this->schema->quoteName('one.two');
         $this->assertSame($this->expect_quote_name, $actual);

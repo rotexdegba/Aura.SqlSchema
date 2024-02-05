@@ -5,7 +5,7 @@ use PDO;
 
 abstract class AbstractSetup
 {
-    protected $pdo;
+    protected \PDO $pdo;
 
     protected $table = 'aura_test_table';
 
@@ -17,7 +17,7 @@ abstract class AbstractSetup
 
     public function __construct()
     {
-        $key = str_replace('\\', '_', get_class($this));
+        $key = str_replace('\\', '_', static::class);
         $this->pdo = new PDO(
             $GLOBALS["{$key}__dsn"],
             $GLOBALS["{$key}__username"],
@@ -66,7 +66,7 @@ abstract class AbstractSetup
         $create_table2 = str_replace(
             $this->table,
             "{$this->schema2}.{$this->table}",
-            $this->create_table
+            (string) $this->create_table
         );
         $this->pdo->query($create_table2);
     }

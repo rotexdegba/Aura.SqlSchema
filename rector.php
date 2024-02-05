@@ -29,6 +29,7 @@ return static function (RectorConfig $rectorConfigurator): void {
     $rectorConfigurator->import(SetList::CODING_STYLE);
     $rectorConfigurator->import(SetList::DEAD_CODE);
     $rectorConfigurator->import(SetList::TYPE_DECLARATION);
+    $rectorConfigurator->import(\Rector\PHPUnit\Set\PHPUnitSetList::PHPUNIT_90);
     
     $skipables = [
         \Rector\CodeQuality\Rector\If_\ShortenElseIfRector::class,
@@ -37,6 +38,10 @@ return static function (RectorConfig $rectorConfigurator): void {
         \Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector::class,
         \Rector\CodeQuality\Rector\If_\CompleteMissingIfElseBracketRector::class,
+        \Rector\Php54\Rector\Array_\LongArrayToShortArrayRector::class,
+        \Rector\PHPUnit\Set\PHPUnitSetList::PHPUNIT_90 => [
+            __DIR__ . '/src/*.php'
+        ],
     ];
     
     $rectorConfigurator->skip($skipables);

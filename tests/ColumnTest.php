@@ -1,9 +1,11 @@
 <?php
 namespace Aura\SqlSchema;
 
-class ColumnTest extends \PHPUnit_Framework_TestCase
+use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+
+class ColumnTest extends PHPUnit_Framework_TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $info = array(
             'name' => 'cost',
@@ -33,7 +35,7 @@ class ColumnTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function test__set_state()
+    public function test__set_state(): void
     {
         $info = array(
             'name' => 'cost',
