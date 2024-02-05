@@ -47,7 +47,7 @@ class SqlsrvSchema extends AbstractSchema
      * @todo Honor the $schema param.
      *
      */
-    public function fetchTableList($schema = null)
+    public function fetchTableList($schema = null): array
     {
         $text = "SELECT name FROM sysobjects WHERE type = 'U' ORDER BY name";
         return $this->pdoFetchCol($text);
@@ -66,10 +66,10 @@ class SqlsrvSchema extends AbstractSchema
      * @todo Honor `schema.table` as the specification.
      *
      */
-    public function fetchTableCols($spec)
+    public function fetchTableCols($spec): array
     {
         // no need for $schema yet
-        list(,$table) = $this->splitName($spec);
+        [, $table] = $this->splitName($spec);
 
         // get column info
         $text = "exec sp_columns @table_name = " . $this->quoteName($table);
@@ -79,22 +79,18 @@ class SqlsrvSchema extends AbstractSchema
         $text = "exec sp_pkeys @table_owner = " . $raw_cols[0]['TABLE_OWNER']
               . ", @table_name = " . $this->quoteName($table);
         $raw_keys = $this->pdoFetchAll($text);
-        $keys = array();
+        $keys = [];
         foreach ($raw_keys as $row) {
             $keys[] = $row['COLUMN_NAME'];
         }
 
-        $cols = array();
+        $cols = [];
         foreach ($raw_cols as $row) {
 
             $name = $row['COLUMN_NAME'];
 
-            $pos = strpos($row['TYPE_NAME'], ' ');
-            if ($pos === false) {
-                $type = $row['TYPE_NAME'];
-            } else {
-                $type = substr($row['TYPE_NAME'], 0, $pos);
-            }
+            $pos = strpos((string) $row['TYPE_NAME'], ' ');
+            $type = $pos === false ? $row['TYPE_NAME'] : substr((string) $row['TYPE_NAME'], 0, $pos);
 
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
@@ -104,7 +100,7 @@ class SqlsrvSchema extends AbstractSchema
                 $row['SCALE'],
                 ! $row['NULLABLE'],
                 $row['COLUMN_DEF'],
-                strpos(strtolower($row['TYPE_NAME']), 'identity') !== false,
+                str_contains(strtolower((string) $row['TYPE_NAME']), 'identity'),
                 in_array($name, $keys)
             );
         }

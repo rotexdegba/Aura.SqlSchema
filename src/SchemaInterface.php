@@ -27,7 +27,7 @@ interface SchemaInterface
      * @return string[] The list of table-names in the database.
      *
      */
-    public function fetchTableList($schema = null);
+    public function fetchTableList($schema = null): array;
 
     /**
      *
@@ -40,7 +40,7 @@ interface SchemaInterface
      * and the value is a Column object.
      *
      */
-    public function fetchTableCols($spec);
+    public function fetchTableCols($spec): array;
 
     /**
      *

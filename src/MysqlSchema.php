@@ -45,12 +45,13 @@ class MysqlSchema extends AbstractSchema
      * @return string[] The list of table-names in the database.
      *
      */
-    public function fetchTableList($schema = null)
+    public function fetchTableList($schema = null): array
     {
         $text = 'SHOW TABLES';
         if ($schema) {
             $text .= ' IN ' . $this->quoteName($schema);
         }
+
         return $this->pdoFetchCol($text);
     }
 
@@ -65,30 +66,30 @@ class MysqlSchema extends AbstractSchema
      * and the value is a Column object.
      *
      */
-    public function fetchTableCols($spec)
+    public function fetchTableCols($spec): array
     {
-        list($schema, $table) = $this->splitName($spec);
+        [$schema, $table] = $this->splitName($spec);
 
         $table = $this->quoteName($table);
-        $text = "SHOW COLUMNS FROM $table";
+        $text = "SHOW COLUMNS FROM {$table}";
 
         if ($schema) {
-            $schema = preg_replace('/[^\w]/', '', $schema);
+            $schema = preg_replace('/[^\w]/', '', (string) $schema);
             $schema = $this->quoteName($schema);
-            $text .= " IN $schema";
+            $text .= " IN {$schema}";
         }
 
         // get the column descriptions
         $raw_cols = $this->pdoFetchAll($text);
 
         // where the column info will be stored
-        $cols = array();
+        $cols = [];
 
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
 
             $name = $val['Field'];
-            list($type, $size, $scale) = $this->getTypeSizeScope($val['Type']);
+            [$type, $size, $scale] = $this->getTypeSizeScope($val['Type']);
 
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
@@ -96,10 +97,10 @@ class MysqlSchema extends AbstractSchema
                 $type,
                 ($size  ? (int) $size  : null),
                 ($scale ? (int) $scale : null),
-                (bool) ($val['Null'] != 'YES'),
+                $val['Null'] != 'YES',
                 $this->getDefault($val['Default']),
-                (bool) (strpos($val['Extra'], 'auto_increment') !== false),
-                (bool) ($val['Key'] == 'PRI')
+                str_contains((string) $val['Extra'], 'auto_increment'),
+                $val['Key'] == 'PRI'
             );
         }
 
@@ -118,7 +119,7 @@ class MysqlSchema extends AbstractSchema
      */
     protected function getDefault($default)
     {
-        $upper = strtoupper($default);
+        $upper = strtoupper(($default ?? ''));
         if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP') {
             // the only non-literal allowed by MySQL is "CURRENT_TIMESTAMP"
             return null;

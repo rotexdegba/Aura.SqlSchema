@@ -28,76 +28,27 @@ class Column
 {
     /**
      *
-     * The name of the column.
-     *
-     * @var string
-     *
-     */
-    protected $name;
-
-    /**
-     *
-     * The datatype of the column.
-     *
-     * @var string
-     *
-     */
-    protected $type;
-
-    /**
-     *
-     * The size of the column; typically, this is a number of bytes or
-     * characters for the column as a whole.
-     *
-     * @var int
-     *
-     */
-    protected $size;
-
-    /**
-     *
-     * The scale of the column (i.e., the number of decimal places).
-     *
-     * @var int
-     *
-     */
-    protected $scale;
-
-    /**
-     *
      * Is the column marked as `NOT NULL`?
      *
-     * @var bool
      *
      */
-    protected $notnull;
-
-    /**
-     *
-     * The default value of the column.
-     *
-     * @var mixed
-     *
-     */
-    protected $default;
+    protected bool $notnull;
 
     /**
      *
      * Is the column auto-incremented?
      *
-     * @var bool
      *
      */
-    protected $autoinc;
+    protected bool $autoinc;
 
     /**
      *
      * Is the column part of the primary key?
      *
-     * @var bool
      *
      */
-    protected $primary;
+    protected bool $primary;
 
     /**
      *
@@ -123,21 +74,47 @@ class Column
      *
      */
     public function __construct(
-        $name,
-        $type,
-        $size,
-        $scale,
+        /**
+         *
+         * The name of the column.
+         *
+         *
+         */
+        protected $name,
+        /**
+         *
+         * The datatype of the column.
+         *
+         *
+         */
+        protected $type,
+        /**
+         *
+         * The size of the column; typically, this is a number of bytes or
+         * characters for the column as a whole.
+         *
+         *
+         */
+        protected $size,
+        /**
+         *
+         * The scale of the column (i.e., the number of decimal places).
+         *
+         *
+         */
+        protected $scale,
         $notnull,
-        $default,
+        /**
+         *
+         * The default value of the column.
+         *
+         *
+         */
+        protected mixed $default,
         $autoinc,
         $primary
     ) {
-        $this->name     = $name;
-        $this->type     = $type;
-        $this->size     = $size;
-        $this->scale    = $scale;
         $this->notnull  = (bool) $notnull;
-        $this->default  = $default;
         $this->autoinc  = (bool) $autoinc;
         $this->primary  = (bool) $primary;
     }
@@ -184,9 +161,9 @@ class Column
      * @return object \Aura\SqlSchema\Column.
      *
      */
-    public static function __set_state($array)
+    public static function __set_state(array $array)
     {
-        $column = new \Aura\SqlSchema\Column(
+        return new \Aura\SqlSchema\Column(
             $array['name'],
             $array['type'],
             $array['size'],
@@ -196,7 +173,5 @@ class Column
             $array['autoinc'],
             $array['primary']
         );
-
-        return $column;
     }
 }

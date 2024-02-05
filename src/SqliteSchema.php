@@ -38,7 +38,7 @@ class SqliteSchema extends AbstractSchema
      * @return string[] The list of table-names in the database.
      *
      */
-    public function fetchTableList($schema = null)
+    public function fetchTableList($schema = null): array
     {
         if ($schema) {
             $cmd = "
@@ -68,11 +68,11 @@ class SqliteSchema extends AbstractSchema
      * and the value is a Column object.
      *
      */
-    public function fetchTableCols($spec)
+    public function fetchTableCols($spec): array
     {
-        list($schema, $table) = $this->getSchemaAndTable($spec);
+        [$schema, $table] = $this->getSchemaAndTable($spec);
         $create = $this->getCreateTable($schema, $table);
-        $cols = array();
+        $cols = [];
         $this->setRawCols($cols, $schema, $table, $create);
         $this->convertColsToObjects($cols, $create);
         return $cols;
@@ -87,20 +87,20 @@ class SqliteSchema extends AbstractSchema
      * @return array A 2-element array of schema and table.
      *
      */
-    protected function getSchemaAndTable($spec)
+    protected function getSchemaAndTable($spec): array
     {
-        list($schema, $table) = $this->splitName($spec);
+        [$schema, $table] = $this->splitName($spec);
 
         // strip non-word characters to try and prevent SQL injections
-        $table = preg_replace('/[^\w]/', '', $table);
+        $table = preg_replace('/[^\w]/', '', (string) $table);
 
         // is there a schema?
         if ($schema) {
             // sanitize and add a dot
-            $schema = preg_replace('/[^\w]/', '', $schema) . '.';
+            $schema = preg_replace('/[^\w]/', '', (string) $schema) . '.';
         }
 
-        return array($schema, $table);
+        return [$schema, $table];
     }
 
     /**
@@ -120,7 +120,7 @@ class SqliteSchema extends AbstractSchema
             SELECT sql FROM {$schema}sqlite_master
             WHERE type = 'table' AND name = :table
         ";
-        return $this->pdoFetchValue($cmd, array('table' => $table));
+        return $this->pdoFetchValue($cmd, ['table' => $table]);
     }
 
     /**
@@ -141,7 +141,7 @@ class SqliteSchema extends AbstractSchema
     protected function setRawCols(&$cols, $schema, $table, $create)
     {
         $table = $this->quoteName($table);
-        $raw_cols = $this->pdoFetchAll("PRAGMA {$schema}TABLE_INFO($table)");
+        $raw_cols = $this->pdoFetchAll("PRAGMA {$schema}TABLE_INFO({$table})");
         foreach ($raw_cols as $val) {
             $this->addColFromRaw($cols, $val, $create);
         }
@@ -160,37 +160,37 @@ class SqliteSchema extends AbstractSchema
      * @return null
      *
      */
-    protected function addColFromRaw(&$cols, $val, $create)
+    protected function addColFromRaw(array &$cols, array $val, $create)
     {
         $name = $val['name'];
-        list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
+        [$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
 
         // find autoincrement column in CREATE TABLE sql.
         $autoinc_find = str_replace(' ', '\s+', $this->autoinc_string);
-        $find = "(\"$name\"|\'$name\'|`$name`|\[$name\]|\\b$name)"
-              . "\s+$autoinc_find";
+        $find = "(\"{$name}\"|\'{$name}\'|`{$name}`|\[{$name}\]|\\b{$name})"
+              . "\s+{$autoinc_find}";
 
         $autoinc = preg_match(
-            "/$find/Ui",
+            "/{$find}/Ui",
             $create,
             $matches
         );
 
         $default = null;
         if ($val['dflt_value'] && $val['dflt_value'] != 'NULL') {
-            $default = trim($val['dflt_value'], "'");
+            $default = trim((string) $val['dflt_value'], "'");
         }
 
-        $cols[$name] = array(
-            'name'    => $name,
-            'type'    => $type,
-            'size'    => ($size  ? (int) $size  : null),
-            'scale'   => ($scale ? (int) $scale : null),
-            'default' => $default,
-            'notnull' => (bool) ($val['notnull']),
-            'primary' => (bool) ($val['pk']),
+        $cols[$name] = [
+            'name'    => $name, 
+            'type'    => $type, 
+            'size'    => ($size  ? (int) $size  : null), 
+            'scale'   => ($scale ? (int) $scale : null), 
+            'default' => $default, 
+            'notnull' => (bool) ($val['notnull']), 
+            'primary' => (bool) ($val['pk']), 
             'autoinc' => (bool) $autoinc,
-        );
+        ];
     }
 
     /**
@@ -204,7 +204,7 @@ class SqliteSchema extends AbstractSchema
      * @return null
      *
      */
-    protected function convertColsToObjects(&$cols, $create)
+    protected function convertColsToObjects(array &$cols, $create)
     {
         $names = array_keys($cols);
         $last = count($names) - 1;
@@ -244,7 +244,7 @@ class SqliteSchema extends AbstractSchema
      * @return null
      *
      */
-    protected function setColumnDefault(&$cols, $name, $curr, $last, $names, $create)
+    protected function setColumnDefault(array &$cols, $name, $curr, $last, array $names, $create)
     {
         // For defaults using keywords, SQLite always reports the keyword
         // *value*, not the keyword itself (e.g., '2007-03-07' instead of
@@ -276,7 +276,7 @@ class SqliteSchema extends AbstractSchema
         }
 
         // is the default a keyword?
-        preg_match("/$find/ims", $create, $matches);
+        preg_match("/{$find}/ims", $create, $matches);
         if (! empty($matches)) {
             $cols[$name]['default'] = null;
         }

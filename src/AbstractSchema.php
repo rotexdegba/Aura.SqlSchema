@@ -39,24 +39,6 @@ abstract class AbstractSchema implements SchemaInterface
 
     /**
      *
-     * A ColumnFactory for returning column information.
-     *
-     * @var ColumnFactory
-     *
-     */
-    protected $column_factory;
-
-    /**
-     *
-     * A Pdo connection.
-     *
-     * @var PDO
-     *
-     */
-    protected $pdo;
-
-    /**
-     *
      * Constructor.
      *
      * @param PDO $pdo A database connection.
@@ -64,10 +46,8 @@ abstract class AbstractSchema implements SchemaInterface
      * @param ColumnFactory $column_factory A column object factory.
      *
      */
-    public function __construct(PDO $pdo, ColumnFactory $column_factory)
+    public function __construct(protected \PDO $pdo, protected \Aura\SqlSchema\ColumnFactory $column_factory)
     {
-        $this->pdo = $pdo;
-        $this->column_factory = $column_factory;
     }
 
     /**
@@ -77,7 +57,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @return ColumnFactory
      *
      */
-    public function getColumnFactory()
+    public function getColumnFactory(): ColumnFactory
     {
         return $this->column_factory;
     }
@@ -93,9 +73,9 @@ abstract class AbstractSchema implements SchemaInterface
      * @return array A sequential array of the column type, size, and scale.
      *
      */
-    protected function getTypeSizeScope($spec)
+    protected function getTypeSizeScope($spec): array
     {
-        $spec  = strtolower($spec);
+        $spec  = strtolower(($spec ?? ''));
         $size  = null;
         $scale = null;
 
@@ -120,7 +100,7 @@ abstract class AbstractSchema implements SchemaInterface
             }
         }
 
-        return array($type, $size, $scale);
+        return [$type, $size, $scale];
     }
 
     /**
@@ -137,11 +117,11 @@ abstract class AbstractSchema implements SchemaInterface
      */
     protected function splitName($name)
     {
-        $pos = strpos($name, '.');
+        $pos = strpos(($name ?? ''), '.');
         if ($pos === false) {
-            return array(null, $name);
+            return [null, $name];
         } else {
-            return array(substr($name, 0, $pos), substr($name, $pos+1));
+            return [substr(($name ?? ''), 0, $pos), substr(($name ?? ''), $pos+1)];
         }
     }
 
@@ -166,10 +146,10 @@ abstract class AbstractSchema implements SchemaInterface
      * @see replaceName()
      *
      */
-    public function quoteName($name)
+    public function quoteName($name): string
     {
         // remove extraneous spaces
-        $name = trim($name);
+        $name = trim(($name ?? ''));
 
         // "name"."name"
         $pos = strrpos($name, '.');
@@ -194,7 +174,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @return array
      *
      */
-    protected function pdoFetchAll($statement, array $values = array())
+    protected function pdoFetchAll($statement, array $values = [])
     {
         $sth = $this->pdo->prepare($statement);
         $sth->execute($values);
@@ -212,7 +192,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @return array
      *
      */
-    protected function pdoFetchCol($statement, array $values = array())
+    protected function pdoFetchCol($statement, array $values = [])
     {
         $sth = $this->pdo->prepare($statement);
         $sth->execute($values);
@@ -230,7 +210,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @return mixed
      *
      */
-    protected function pdoFetchValue($statement, array $values = array())
+    protected function pdoFetchValue($statement, array $values = [])
     {
         $sth = $this->pdo->prepare($statement);
         $sth->execute($values);

@@ -27,7 +27,7 @@ class PgsqlSchema extends AbstractSchema
      * @return string[] All table names in the database.
      *
      */
-    public function fetchTableList($schema = null)
+    public function fetchTableList($schema = null): array
     {
         if ($schema) {
             $cmd = "
@@ -35,7 +35,7 @@ class PgsqlSchema extends AbstractSchema
                 FROM information_schema.tables
                 WHERE table_schema = :schema
             ";
-            $values = array('schema' => $schema);
+            $values = ['schema' => $schema];
         } else {
             $cmd = "
                 SELECT table_schema || '.' || table_name
@@ -43,7 +43,7 @@ class PgsqlSchema extends AbstractSchema
                 WHERE table_schema != 'pg_catalog'
                 AND table_schema != 'information_schema'
             ";
-            $values = array();
+            $values = [];
         }
 
         return $this->pdoFetchCol($cmd, $values);
@@ -60,9 +60,9 @@ class PgsqlSchema extends AbstractSchema
      * and the value is a Column object.
      *
      */
-    public function fetchTableCols($spec)
+    public function fetchTableCols($spec): array
     {
-        list($schema, $table) = $this->splitName($spec);
+        [$schema, $table] = $this->splitName($spec);
 
         // modified from Zend_Db_Connection_Pdo_Pgsql
         $cmd = "
@@ -83,7 +83,7 @@ class PgsqlSchema extends AbstractSchema
             WHERE a.attnum > 0 AND c.relname = :table
         ";
 
-        $bind_values = array('table' => $table);
+        $bind_values = ['table' => $table];
 
         if ($schema) {
             $cmd .= " AND n.nspname = :schema";
@@ -93,7 +93,7 @@ class PgsqlSchema extends AbstractSchema
         $cmd .= "\n            ORDER BY a.attnum";
 
         // where the columns are stored
-        $cols = array();
+        $cols = [];
 
         // get the column descriptions
         $raw_cols = $this->pdoFetchAll($cmd, $bind_values);
@@ -101,7 +101,7 @@ class PgsqlSchema extends AbstractSchema
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
             $name = $val['name'];
-            list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
+            [$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
                 $type,
@@ -109,7 +109,7 @@ class PgsqlSchema extends AbstractSchema
                 ($scale ? (int) $scale : null),
                 (bool) ($val['notnull']),
                 $this->getDefault($val['default']),
-                (bool) (substr($val['default'], 0, 7) == 'nextval'),
+                str_starts_with((string) $val['default'], 'nextval'),
                 (bool) ($val['primary'])
             );
         }
@@ -138,12 +138,12 @@ class PgsqlSchema extends AbstractSchema
         }
 
         // string literal?
-        $k = substr($default, 0, 1);
+        $k = substr(($default ?? ''), 0, 1);
         if ($k == '"' || $k == "'") {
             // find the trailing :: typedef
-            $pos = strrpos($default, '::');
+            $pos = strrpos(($default ?? ''), '::');
             // also remove the leading and trailing quotes
-            return substr($default, 1, $pos-2);
+            return substr(($default ?? ''), 1, $pos-2);
         }
 
         // null or non-literal

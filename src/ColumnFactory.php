@@ -39,7 +39,6 @@ class ColumnFactory
      *
      * @param bool $primary Is the column part of the primary key?
      *
-     * @return Column
      *
      */
     public function newInstance(
@@ -48,10 +47,10 @@ class ColumnFactory
         $size,
         $scale,
         $notnull,
-        $default,
+        mixed $default,
         $autoinc,
         $primary
-    ) {
+    ): \Aura\SqlSchema\Column {
         return new Column(
             $name,
             $type,
