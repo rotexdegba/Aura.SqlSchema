@@ -18,7 +18,9 @@ use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 class BaseSchemaTest extends PHPUnit_Framework_TestCase
 {
     public $setup;
+    
     protected $expect_fetch_table_list_schema;
+    
     protected $extension;
 
     protected $pdo_type;
