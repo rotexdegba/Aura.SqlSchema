@@ -54,8 +54,6 @@ abstract class AbstractSchema implements SchemaInterface
      *
      * Returns the column factory object.
      *
-     * @return ColumnFactory
-     *
      */
     public function getColumnFactory(): ColumnFactory
     {
