@@ -138,7 +138,7 @@ class SqliteSchema extends AbstractSchema
      * @return null
      *
      */
-    protected function setRawCols(&$cols, $schema, $table, $create)
+    protected function setRawCols(array &$cols, $schema, $table, $create)
     {
         $table = $this->quoteName($table);
         $raw_cols = $this->pdoFetchAll("PRAGMA {$schema}TABLE_INFO({$table})");
