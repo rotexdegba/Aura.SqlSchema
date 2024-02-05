@@ -1,8 +1,10 @@
 <?php
 namespace Aura\SqlSchema;
 
-class MysqlSchemaTest extends AbstractSchemaTest
+class MysqlSchemaTest extends BaseSchemaTest
 {
+    use CommonSchemaTestCodeTrait;
+    
     protected $extension = 'pdo_mysql';
 
     protected $pdo_type = 'mysql';

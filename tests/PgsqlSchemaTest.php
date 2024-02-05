@@ -1,8 +1,10 @@
 <?php
 namespace Aura\SqlSchema;
 
-class PgsqlSchemaTest extends AbstractSchemaTest
+class PgsqlSchemaTest extends BaseSchemaTest
 {
+    use CommonSchemaTestCodeTrait;
+    
     protected $extension = 'pdo_pgsql';
 
     protected $pdo_type = 'pgsql';

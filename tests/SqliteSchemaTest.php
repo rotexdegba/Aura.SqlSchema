@@ -1,8 +1,10 @@
 <?php
 namespace Aura\SqlSchema;
 
-class SqliteSchemaTest extends AbstractSchemaTest
+class SqliteSchemaTest extends BaseSchemaTest
 {
+    use CommonSchemaTestCodeTrait;
+    
     protected $extension = 'pdo_sqlite';
 
     protected $pdo_type = 'sqlite';

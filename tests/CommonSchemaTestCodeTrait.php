@@ -1,23 +1,11 @@
 <?php
 namespace Aura\SqlSchema;
 
-use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-
-abstract class AbstractSchemaTest extends PHPUnit_Framework_TestCase
-{
-    public $setup;
-    public $expect_fetch_table_list_schema;
-    protected $extension;
-
-    protected $pdo_type;
-
-    protected $schema;
-
-    protected $expect_fetch_table_list;
-
-    protected $expect_fetch_table_cols;
-
-    protected $expect_quote_name = '"one"."two"';
+/**
+ *
+ * @author rotimi
+ */
+trait CommonSchemaTestCodeTrait {
 
     protected function setUp(): void
     {
@@ -40,8 +28,19 @@ abstract class AbstractSchemaTest extends PHPUnit_Framework_TestCase
             );
         }
 
-        // database setup
+        // database setup        
         $setup_class = 'Aura\SqlSchema\Setup\\' . ucfirst((string) $this->pdo_type) . 'Setup';
+        
+        $key = str_replace('\\', '_', $setup_class);
+        
+        if(
+            !isset($GLOBALS["{$key}__dsn"])
+            || !isset($GLOBALS["{$key}__username"])
+            || !isset($GLOBALS["{$key}__password"])
+        ) {
+            $this->markTestSkipped('Skipping executing `' . static::class . '`. DB PDO credentials not set up in phpunit.xml  config' );
+        }
+        
         $this->setup = new $setup_class;
 
         // schema class same as this class, minus "Test"

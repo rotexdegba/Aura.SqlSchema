@@ -14,7 +14,7 @@ abstract class AbstractSetup
     protected $schema2 = 'aura_test_schema2';
 
     protected $create_table;
-
+    
     public function __construct()
     {
         $key = str_replace('\\', '_', static::class);

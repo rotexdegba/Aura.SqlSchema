@@ -60,16 +60,17 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         );
 
         $actual = var_export($col, true);
+        
         $expect = <<<EXPECT
 Aura\SqlSchema\Column::__set_state(array(
+   'notnull' => true,
+   'autoinc' => false,
+   'primary' => false,
    'name' => 'cost',
    'type' => 'numeric',
    'size' => 10,
    'scale' => 2,
-   'notnull' => true,
    'default' => NULL,
-   'autoinc' => false,
-   'primary' => false,
 ))
 EXPECT;
         if (defined('HHVM_VERSION')) {
