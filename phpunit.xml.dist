@@ -8,6 +8,14 @@
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
          failOnWarning="true">
+
+    <coverage>
+        <report>
+            <clover outputFile="build/logs/clover.xml"/>
+            <html outputDirectory="build/coverage" lowUpperBound="35" highLowerBound="70"/>
+        </report>
+    </coverage>
+
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>
@@ -20,6 +28,10 @@
         </include>
     </source>
     
+    <logging>
+        <junit outputFile="build/logs/junit.xml"/>
+    </logging>
+
     <php>  
         <var name="Aura_SqlSchema_Setup_MysqlSetup__dsn" value="mysql:host=127.0.0.1" />
         <var name="Aura_SqlSchema_Setup_MysqlSetup__username" value="root" />
