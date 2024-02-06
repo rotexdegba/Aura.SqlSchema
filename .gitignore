@@ -4,3 +4,4 @@
 /nbproject
 .phpunit.cache
 .phpunit.result.cache
+/build
