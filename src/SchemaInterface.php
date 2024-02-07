@@ -46,8 +46,6 @@ interface SchemaInterface
      *
      * Returns the column factory object.
      *
-     * @return ColumnFactory
-     *
      */
-    public function getColumnFactory();
+    public function getColumnFactory(): ColumnFactory;
 }
