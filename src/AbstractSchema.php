@@ -23,7 +23,6 @@ abstract class AbstractSchema implements SchemaInterface
      *
      * The quote prefix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_prefix = '"';
@@ -32,7 +31,6 @@ abstract class AbstractSchema implements SchemaInterface
      *
      * The quote suffix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_suffix = '"';

@@ -18,12 +18,10 @@ namespace Aura\SqlSchema;
 class MysqlSchema extends AbstractSchema
 {
     protected $maria = false; // if the current DB server is mariadb
-    
     /**
      *
      * The quote prefix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_prefix = '`';
@@ -32,7 +30,6 @@ class MysqlSchema extends AbstractSchema
      *
      * The quote suffix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_suffix = '`';
@@ -45,7 +42,7 @@ class MysqlSchema extends AbstractSchema
         
         if (
             isset($vars['version']) 
-            && str_contains(mb_strtolower($vars['version'], 'UTF-8'), 'maria')
+            && str_contains(mb_strtolower((string) $vars['version'], 'UTF-8'), 'maria')
         ) {
             $this->maria = true;
         }
@@ -117,8 +114,8 @@ class MysqlSchema extends AbstractSchema
                 }
                 
                 if(
-                    (in_array(mb_strtolower($type, 'UTF-8'), ['char', 'varchar', 'text']))
-                    && $default_val === '\'\''
+                    (in_array(mb_strtolower((string) $type, 'UTF-8'), ['char', 'varchar', 'text']))
+                    && $default_val === "''"
                 ) {
                     $default_val = '';
                 }

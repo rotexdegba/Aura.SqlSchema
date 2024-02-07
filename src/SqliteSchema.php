@@ -23,7 +23,6 @@ class SqliteSchema extends AbstractSchema
      *
      * This is for SQLite version 3; version 2 is different.
      *
-     * @var string
      *
      */
     protected string $autoinc_string = 'INTEGER (?:NULL |NOT NULL )?PRIMARY KEY AUTOINCREMENT';

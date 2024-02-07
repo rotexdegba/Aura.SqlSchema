@@ -21,7 +21,6 @@ class SqlsrvSchema extends AbstractSchema
      *
      * The quote prefix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_prefix = '[';
@@ -30,7 +29,6 @@ class SqlsrvSchema extends AbstractSchema
      *
      * The quote suffix for identifier names.
      *
-     * @var string
      *
      */
     protected string $quote_name_suffix = ']';

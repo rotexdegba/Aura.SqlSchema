@@ -63,34 +63,51 @@ class PgsqlSchema extends AbstractSchema
     public function fetchTableCols($spec): array
     {
         [$schema, $table] = $this->splitName($spec);
-
-        // modified from Zend_Db_Connection_Pdo_Pgsql
-        $cmd = "
-            SELECT
-                a.attname AS name,
-                FORMAT_TYPE(a.atttypid, a.atttypmod) AS type,
-                a.attnotnull AS notnull,
-                co.contype AS primary,
-                d.adsrc AS default
-            FROM pg_attribute AS a
-            JOIN pg_class AS c ON a.attrelid = c.oid
-            JOIN pg_namespace AS n ON c.relnamespace = n.oid
-            JOIN pg_type AS t ON a.atttypid = t.oid
-            LEFT OUTER JOIN pg_constraint AS co
-                ON (co.conrelid = c.oid AND a.attnum = ANY(co.conkey) AND co.contype = 'p')
-            LEFT OUTER JOIN pg_attrdef AS d
-                ON (d.adrelid = c.oid AND d.adnum = a.attnum)
-            WHERE a.attnum > 0 AND c.relname = :table
-        ";
-
-        $bind_values = ['table' => $table];
-
-        if ($schema) {
-            $cmd .= " AND n.nspname = :schema";
-            $bind_values['schema'] = $schema;
+        
+        if($schema === null) {
+           
+            $schema = $this->fetchCurrentSchema();
         }
 
-        $cmd .= "\n            ORDER BY a.attnum";
+        $cmd = "
+            SELECT
+            
+                columns.column_name as name,
+                columns.data_type as type,
+                COALESCE(
+                    columns.character_maximum_length,
+                    columns.numeric_precision
+                ) AS size,
+                columns.numeric_scale AS scale,
+                CASE
+                    WHEN columns.is_nullable = 'YES' THEN 0
+                    ELSE 1
+                END AS notnull,
+                columns.column_default AS default,
+                CASE
+                    WHEN SUBSTRING(columns.COLUMN_DEFAULT FROM 1 FOR 7) = 'nextval' THEN 1
+                    ELSE 0
+                END AS autoinc,
+                CASE
+                    WHEN table_constraints.constraint_type = 'PRIMARY KEY' THEN 1
+                    ELSE 0
+                END AS primary
+                
+            FROM information_schema.columns
+                LEFT JOIN information_schema.key_column_usage
+                    ON columns.table_schema = key_column_usage.table_schema
+                    AND columns.table_name = key_column_usage.table_name
+                    AND columns.column_name = key_column_usage.column_name
+                LEFT JOIN information_schema.table_constraints
+                    ON key_column_usage.table_schema = table_constraints.table_schema
+                    AND key_column_usage.table_name = table_constraints.table_name
+                    AND key_column_usage.constraint_name = table_constraints.constraint_name
+            WHERE columns.table_schema = :schema
+            AND columns.table_name = :table
+            ORDER BY columns.ordinal_position
+        ";
+
+        $bind_values = ['table' => $table, 'schema' => $schema ];
 
         // where the columns are stored
         $cols = [];
@@ -101,14 +118,18 @@ class PgsqlSchema extends AbstractSchema
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
             $name = $val['name'];
-            [$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
+            $type = $val['type'];
+            $size = $val['size'];
+            $scale = $val['scale'];
+            //[$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
+            
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
                 $type,
                 ($size  ? (int) $size  : null),
                 ($scale ? (int) $scale : null),
                 (bool) ($val['notnull']),
-                $this->getDefault($val['default']),
+                $this->getDefault($val['default'], $type, !((bool) ($val['notnull'])) ),
                 str_starts_with((string) $val['default'], 'nextval'),
                 (bool) ($val['primary'])
             );
@@ -130,23 +151,32 @@ class PgsqlSchema extends AbstractSchema
      * @return scalar A literal PHP value.
      *
      */
-    protected function getDefault($default)
+    protected function getDefault($default, $type, $nullable)
     {
+        // null?
+        if ($default === null || strtoupper((string)$default) === 'NULL') {
+            return null;
+        }
+
         // numeric literal?
         if (is_numeric($default)) {
             return $default;
         }
 
         // string literal?
-        $k = substr(($default ?? ''), 0, 1);
+        $k = substr((string)$default, 0, 1);
         if ($k == '"' || $k == "'") {
             // find the trailing :: typedef
-            $pos = strrpos(($default ?? ''), '::');
+            $pos = strrpos((string)$default, '::');
             // also remove the leading and trailing quotes
-            return substr(($default ?? ''), 1, $pos-2);
+            return substr((string)$default, 1, $pos-2);
         }
 
-        // null or non-literal
         return null;
+    }
+    
+    public function fetchCurrentSchema() : string
+    {
+        return $this->pdoFetchValue('SELECT CURRENT_SCHEMA');
     }
 }

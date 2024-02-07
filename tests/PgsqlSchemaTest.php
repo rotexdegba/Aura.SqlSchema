@@ -20,7 +20,7 @@ class PgsqlSchemaTest extends BaseSchemaTest
         'id' => array(
             'name' => 'id',
             'type' => 'integer',
-            'size' => null,
+            'size' => 32, // was null before refactoring, 32  works  with postgres:16.1
             'scale' => null,
             'default' => null,
             'notnull' => true,
