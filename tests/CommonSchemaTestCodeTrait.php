@@ -14,20 +14,6 @@ trait CommonSchemaTestCodeTrait {
             $this->markTestSkipped("Extension '{$this->extension}' not loaded.");
         }
 
-        // convert column arrays to objects
-        foreach ($this->expect_fetch_table_cols as $name => $info) {
-            $this->expect_fetch_table_cols[$name] = new Column(
-                $info['name'],
-                $info['type'],
-                $info['size'],
-                $info['scale'],
-                $info['notnull'],
-                $info['default'],
-                $info['autoinc'],
-                $info['primary']
-            );
-        }
-
         // database setup        
         $setup_class = 'Aura\SqlSchema\Setup\\' . ucfirst((string) $this->pdo_type) . 'Setup';
         
@@ -45,10 +31,56 @@ trait CommonSchemaTestCodeTrait {
 
         // schema class same as this class, minus "Test"
         $class = substr(static::class, 0, -4);
+        
+        /** @var \PDO $pdo */
+        $pdo = $this->setup->getPdo();
+        
         $this->schema = new $class(
-            $this->setup->getPdo(),
+            $pdo,
             new ColumnFactory
         );
+        
+        if(
+            $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql'
+        ) {
+            $version_number = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            
+            $is_mariadb = false;
+            $vars = $pdo->query("SHOW VARIABLES LIKE '%version%'")
+                        ->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+            if (
+                isset($vars['version']) 
+                && str_contains(mb_strtolower($vars['version'], 'UTF-8'), 'maria')
+            ) {
+                $is_mariadb = true;
+            }
+            
+            if(version_compare($version_number, '8.0.0', '>=') && !$is_mariadb) {
+                
+                // integer size no longer needed in mysql 8+
+                $this->expect_fetch_table_cols['id']['size'] = null;
+                
+                // timestamp column with column definition sql not explicitly 
+                // specifying NOT NULL leads to the column being  nullable 
+                // in mysql 8+
+                $this->expect_fetch_table_cols['test_default_ignore']['notnull'] = false;
+            }
+        }
+        
+        // convert column arrays to objects
+        foreach ($this->expect_fetch_table_cols as $name => $info) {
+            $this->expect_fetch_table_cols[$name] = new Column(
+                $info['name'],
+                $info['type'],
+                $info['size'],
+                $info['scale'],
+                $info['notnull'],
+                $info['default'],
+                $info['autoinc'],
+                $info['primary']
+            );
+        }
     }
 
     public function testGetColumnFactory(): void
