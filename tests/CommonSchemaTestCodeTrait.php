@@ -56,14 +56,19 @@ trait CommonSchemaTestCodeTrait {
                 $is_mariadb = true;
             }
             
-            if(version_compare($version_number, '8.0.0', '>=') && !$is_mariadb) {
+            if(!$is_mariadb && version_compare($version_number, '8.0.0', '>=')) {
                 
                 // integer size no longer needed in mysql 8+
                 $this->expect_fetch_table_cols['id']['size'] = null;
+            }
+            
+            if(
+                (!$is_mariadb && version_compare($version_number, '8.0.0', '>='))
+                || ($is_mariadb && version_compare($version_number, '10.11.6', '>='))) {
                 
                 // timestamp column with column definition sql not explicitly 
                 // specifying NOT NULL leads to the column being  nullable 
-                // in mysql 8+
+                // in mysql 8+ & mariadb 10.11.6+
                 $this->expect_fetch_table_cols['test_default_ignore']['notnull'] = false;
             }
         }

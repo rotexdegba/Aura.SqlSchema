@@ -17,6 +17,8 @@ namespace Aura\SqlSchema;
  */
 class MysqlSchema extends AbstractSchema
 {
+    protected $maria = false; // if the current DB server is mariadb
+    
     /**
      *
      * The quote prefix for identifier names.
@@ -24,7 +26,7 @@ class MysqlSchema extends AbstractSchema
      * @var string
      *
      */
-    protected $quote_name_prefix = '`';
+    protected string $quote_name_prefix = '`';
 
     /**
      *
@@ -33,8 +35,22 @@ class MysqlSchema extends AbstractSchema
      * @var string
      *
      */
-    protected $quote_name_suffix = '`';
+    protected string $quote_name_suffix = '`';
 
+    public function __construct(\PDO $pdo, ColumnFactory $column_factory) {
+        parent::__construct($pdo, $column_factory);
+        
+        $vars = $pdo->query("SHOW VARIABLES LIKE '%version%'")
+                    ->fetchAll(\PDO::FETCH_KEY_PAIR);
+        
+        if (
+            isset($vars['version']) 
+            && str_contains(mb_strtolower($vars['version'], 'UTF-8'), 'maria')
+        ) {
+            $this->maria = true;
+        }
+    }
+    
     /**
      *
      * Returns a list of tables in the database.
@@ -69,7 +85,7 @@ class MysqlSchema extends AbstractSchema
     public function fetchTableCols($spec): array
     {
         [$schema, $table] = $this->splitName($spec);
-
+        
         $table = $this->quoteName($table);
         $text = "SHOW COLUMNS FROM {$table}";
 
@@ -81,7 +97,7 @@ class MysqlSchema extends AbstractSchema
 
         // get the column descriptions
         $raw_cols = $this->pdoFetchAll($text);
-
+        
         // where the column info will be stored
         $cols = [];
 
@@ -90,6 +106,23 @@ class MysqlSchema extends AbstractSchema
 
             $name = $val['Field'];
             [$type, $size, $scale] = $this->getTypeSizeScope($val['Type']);
+            
+            $default_val = $this->getDefault($val['Default'], $val['Null'] == 'YES');
+            
+            if($this->maria) {
+                
+                if($val['Null'] == 'YES' && $default_val === 'NULL') {
+                    
+                    $default_val = null;
+                }
+                
+                if(
+                    (in_array(mb_strtolower($type, 'UTF-8'), ['char', 'varchar', 'text']))
+                    && $default_val === '\'\''
+                ) {
+                    $default_val = '';
+                }
+            }
 
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
@@ -98,7 +131,7 @@ class MysqlSchema extends AbstractSchema
                 ($size  ? (int) $size  : null),
                 ($scale ? (int) $scale : null),
                 $val['Null'] != 'YES',
-                $this->getDefault($val['Default']),
+                $default_val,
                 str_contains((string) $val['Extra'], 'auto_increment'),
                 $val['Key'] == 'PRI'
             );
@@ -117,10 +150,14 @@ class MysqlSchema extends AbstractSchema
      * @return string
      *
      */
-    protected function getDefault($default)
+    protected function getDefault($default, $nullable)
     {
+        if ($this->maria && $nullable && $default === 'NULL') {
+            return null;
+        }
+        
         $upper = strtoupper(($default ?? ''));
-        if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP') {
+        if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP' || ($this->maria && $upper == 'CURRENT_TIMESTAMP()') ) {
             // the only non-literal allowed by MySQL is "CURRENT_TIMESTAMP"
             return null;
         } else {
