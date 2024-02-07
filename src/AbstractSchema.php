@@ -26,7 +26,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @var string
      *
      */
-    protected $quote_name_prefix = '"';
+    protected string $quote_name_prefix = '"';
 
     /**
      *
@@ -35,7 +35,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @var string
      *
      */
-    protected $quote_name_suffix = '"';
+    protected string $quote_name_suffix = '"';
 
     /**
      *
