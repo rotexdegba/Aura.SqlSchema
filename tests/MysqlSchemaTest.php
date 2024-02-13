@@ -80,7 +80,12 @@ class MysqlSchemaTest extends BaseSchemaTest
             'size' => null,
             'scale' => null,
             'default' => null,
-            'notnull' => true,
+            'notnull' => true, // this value will be changed in 
+                               // CommonSchemaTestCodeTrait::setUp() for 
+                               // mysql 8+ & mariadb 10.11.6+ that allow
+                               // this timestamp column (that wasn't
+                               // explicitly declared as NOT NULL) to
+                               // be nullable by default
             'primary' => false,
             'autoinc' => false,
         ),

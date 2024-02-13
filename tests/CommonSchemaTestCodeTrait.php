@@ -40,9 +40,8 @@ trait CommonSchemaTestCodeTrait {
             new ColumnFactory
         );
         
-        if(
-            $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql'
-        ) {
+        if( $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql' ) {
+            
             $version_number = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
             
             $is_mariadb = false;
