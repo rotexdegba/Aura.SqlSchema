@@ -23,7 +23,7 @@ Alternatively, [download a release](https://github.com/rotexdegba/Aura.SqlSchema
 
 ### Quality
 
-[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/badges/coverage.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/)
+[![Coverage Status](https://coveralls.io/repos/github/rotexdegba/Aura.SqlSchema/badge.svg?branch=rotexsoft-3.x)](https://coveralls.io/github/rotexdegba/Aura.SqlSchema?branch=rotexsoft-3.x)
 [![Build Status](https://travis-ci.org/auraphp/Aura.SqlSchema.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.SqlSchema)
 
 To run the unit tests at the command line, issue `phpunit` at the package root. (This requires [PHPUnit][] to be available as `phpunit`.)
