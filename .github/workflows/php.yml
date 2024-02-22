@@ -34,8 +34,35 @@ jobs:
             #exclude:
                 #- os: ubuntu-20.04
                   #php: 7.3
+            mysql-version:
+              - "8.0"
+            pgsql-version:
+              - "14"
+              
+    services:
+      postgres:
+        image: postgres:${{ matrix.pgsql-version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          #POSTGRES_DB: test
+        ports:
+          - 5432:5432
+          #- 15432:5432
+        options: --name=postgres --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: PHP-${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          #MYSQL_DATABASE: spiral
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+          #- 13306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    name: PHP-${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }} - ${{ matrix.mysql-version }} - ${{ matrix.pgsql-version }}
 
     steps:
     - name: Checkout code
@@ -45,6 +72,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
           php-version: ${{ matrix.php }}
+          extensions: curl, intl, mbstring, pdo, pdo_pgsql, pdo_mysql
           ini-values: pcre.jit=0, pcre.backtrack_limit=9999999, pcre.recursion_limit=9999999
           coverage: xdebug
 
