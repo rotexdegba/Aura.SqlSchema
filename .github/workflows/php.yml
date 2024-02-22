@@ -62,7 +62,7 @@ jobs:
           #- 13306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    name: PHP-${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }} - ${{ matrix.mysql-version }} - ${{ matrix.pgsql-version }}
+    name: PHP-${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }} - Mysql ${{ matrix.mysql-version }} - Postgres ${{ matrix.pgsql-version }}
 
     steps:
     - name: Checkout code
