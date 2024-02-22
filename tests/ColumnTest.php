@@ -62,6 +62,21 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $actual = var_export($col, true);
         
         $expect = <<<EXPECT
+\Rotexsoft\SqlSchema\Column::__set_state(array(
+   'name' => 'cost',
+   'type' => 'numeric',
+   'size' => 10,
+   'scale' => 2,
+   'notnull' => true,
+   'default' => NULL,
+   'autoinc' => false,
+   'primary' => false,
+))
+EXPECT;
+        
+        if(PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 1) {
+            
+        $expect = <<<EXPECT
 Rotexsoft\SqlSchema\Column::__set_state(array(
    'name' => 'cost',
    'type' => 'numeric',
@@ -73,6 +88,9 @@ Rotexsoft\SqlSchema\Column::__set_state(array(
    'primary' => false,
 ))
 EXPECT;
+        }
+
+        
         if (defined('HHVM_VERSION')) {
             $expect = str_replace('   ', '  ', $expect);
         }
