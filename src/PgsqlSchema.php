@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -14,6 +14,7 @@ namespace Aura\SqlSchema;
  *
  * @package Aura.SqlSchema
  *
+ * @psalm-suppress UnusedClass
  */
 class PgsqlSchema extends AbstractSchema
 {
@@ -26,10 +27,11 @@ class PgsqlSchema extends AbstractSchema
      *
      * @return string[] All table names in the database.
      *
+     * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function fetchTableList($schema = null): array
+    public function fetchTableList(?string $schema = null): array
     {
-        if ($schema) {
+        if ($schema !== null) {
             $cmd = "
                 SELECT table_name
                 FROM information_schema.tables
@@ -59,8 +61,11 @@ class PgsqlSchema extends AbstractSchema
      * @return Column[] An associative array where the key is the column name
      * and the value is a Column object.
      *
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedArrayOffset
      */
-    public function fetchTableCols($spec): array
+    public function fetchTableCols(string $spec): array
     {
         [$schema, $table] = $this->splitName($spec);
         
@@ -124,12 +129,12 @@ class PgsqlSchema extends AbstractSchema
             //[$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
             
             $cols[$name] = $this->column_factory->newInstance(
-                $name,
-                $type,
+                (string)$name,
+                (string)$type,
                 ($size  ? (int) $size  : null),
                 ($scale ? (int) $scale : null),
                 (bool) ($val['notnull']),
-                $this->getDefault($val['default'], $type, !((bool) ($val['notnull'])) ),
+                $this->getDefault($val['default'], (string)$type, !((bool) ($val['notnull'])) ),
                 str_starts_with((string) $val['default'], 'nextval'),
                 (bool) ($val['primary'])
             );
@@ -146,12 +151,13 @@ class PgsqlSchema extends AbstractSchema
      * SQL NULLs are converted to PHP nulls.  Non-literal values (such as
      * keywords and functions) are also returned as null.
      *
-     * @param string $default The column default SQL value.
+     * @param mixed $default The column default SQL value.
      *
-     * @return scalar A literal PHP value.
-     *
+     * @return mixed A literal PHP value.
+     * 
+     * @psalm-suppress PossiblyUnusedParam
      */
-    protected function getDefault($default, $type, $nullable)
+    protected function getDefault(mixed $default, string $type, bool $nullable)
     {
         // null?
         if ($default === null || strtoupper((string)$default) === 'NULL') {
@@ -165,16 +171,21 @@ class PgsqlSchema extends AbstractSchema
 
         // string literal?
         $k = substr((string)$default, 0, 1);
-        if ($k == '"' || $k == "'") {
+        if(($k == '"' || $k == "'") && str_contains((string)$default, '::')) {
             // find the trailing :: typedef
             $pos = strrpos((string)$default, '::');
             // also remove the leading and trailing quotes
+            /** @psalm-suppress PossiblyFalseOperand */
             return substr((string)$default, 1, $pos-2);
         }
 
         return null;
     }
     
+    /**
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MixedReturnStatement
+     */
     public function fetchCurrentSchema() : string
     {
         return $this->pdoFetchValue('SELECT CURRENT_SCHEMA');

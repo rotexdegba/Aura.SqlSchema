@@ -1,17 +1,25 @@
-# Aura.SqlSchema
+# Rotexsoft/SqlSchema a fork of Aura.SqlSchema
 
 Provides facilities to read table names and table columns from a database
 using a [PDO](http://php.net/PDO) connection.
 
 ## Foreword
 
+This fork has been fine-tuned to work with Mariadb which [Aura.SqlSchema](https://github.com/auraphp/Aura.SqlSchema) was not designed to support.
+This fork has been tested against the following databases:
+- Mariadb 10.4.x, 10.5.x, 10.6.x, 10.11.x, 11.0.x, 11.1.x & 11.2.x
+- Mysql 5.6, 5.7, 8.0.x & 8.3.x 
+- Postgres 12.x, 13.x, 14.x, 15.x & 16.x
+
+Some future work will be done to make sure it works with Microsoft Sql Server
+
 ### Installation
 
 This library requires PHP 5.3 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
 
-It is installable and autoloadable via Composer as [aura/sqlschema](https://packagist.org/packages/aura/sqlschema).
+It is installable and autoloadable via Composer as [rotexsoft/sqlschema](https://packagist.org/packages/rotexsoft/sqlschema).
 
-Alternatively, [download a release](https://github.com/auraphp/Aura.SqlSchema/releases) or clone this repository, then require or include its _autoload.php_ file.
+Alternatively, [download a release](https://github.com/rotexdegba/Aura.SqlSchema/releases) or clone this repository, then require or include its _autoload.php_ file.
 
 ### Quality
 
@@ -30,10 +38,23 @@ you notice compliance oversights, please send a patch via pull request.
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
 
-### Community
+### Branching
 
-To ask questions, provide feedback, or otherwise communicate with the Aura community, please join our [Google Group](http://groups.google.com/group/auraphp), follow [@auraphp on Twitter](http://twitter.com/auraphp), or chat with us on #auraphp on Freenode.
+These are the branches in this repository:
 
+- **2.x:** Corresponds to the **2.x** branch in the original [Aura.SqlSchema Repository](https://github.com/auraphp/Aura.SqlSchema). There's no plan to actively maintain this branch, but it could be synced with the [Aura.SqlSchema Repository](https://github.com/auraphp/Aura.SqlSchema) (i.e. changes to the **2.x** branch in that repo can be pulled in).
+
+
+- **php-8-deprecation-fixes:** this branch was started from the **2.x** branch and contains changes to make the code-base compliant with PHP 8.1+ & increased the minimum PHP version to 8.1. It was meant as a branch to be contributed to the [Aura.SqlSchema Repository](https://github.com/auraphp/Aura.SqlSchema). See https://github.com/auraphp/Aura.SqlSchema/issues/22
+
+
+- **rotexsoft-3.x:** this branch was started from the **php-8-deprecation-fixes** branch. It is no longer compatible with the original [Aura.SqlSchema package](https://github.com/auraphp/Aura.SqlSchema) due to the following changes:
+  - changed the **Aura\SqlSchema** namespace to **Rotexsoft\SqlSchema**
+  - more stricter type-hinting applied across the code-base, leading to changes in some of the interface method signatures.
+  >This is going to be the branch in which code for version 3.x releases of **rotexsoft/sqlschema** will reside
+
+
+There will be future branches like **rotexsoft-4.x** & the likes for versions 4.x & above.
 
 ## Getting Started
 
@@ -44,11 +65,11 @@ Instantiate a driver-specific schema object with a matching
 
 ```php
 <?php
-use Aura\SqlSchema\ColumnFactory;
-use Aura\SqlSchema\MysqlSchema; // for MySQL
-use Aura\SqlSchema\PgsqlSchema; // for PostgreSQL
-use Aura\SqlSchema\SqliteSchema; // for Sqlite
-use Aura\SqlSchema\SqlsrvSchema; // for Microsoft SQL Server
+use Rotexsoft\SqlSchema\ColumnFactory;
+use Rotexsoft\SqlSchema\MysqlSchema; // for MySQL
+use Rotexsoft\SqlSchema\PgsqlSchema; // for PostgreSQL
+use Rotexsoft\SqlSchema\SqliteSchema; // for Sqlite
+use Rotexsoft\SqlSchema\SqlsrvSchema; // for Microsoft SQL Server
 use PDO;
 
 // a PDO connection

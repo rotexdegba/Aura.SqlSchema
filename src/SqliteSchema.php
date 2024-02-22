@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -14,6 +14,7 @@ namespace Aura\SqlSchema;
  *
  * @package Aura.SqlSchema
  *
+ * @psalm-suppress UnusedClass
  */
 class SqliteSchema extends AbstractSchema
 {
@@ -36,10 +37,11 @@ class SqliteSchema extends AbstractSchema
      *
      * @return string[] The list of table-names in the database.
      *
+     * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function fetchTableList($schema = null): array
+    public function fetchTableList(?string $schema = null): array
     {
-        if ($schema) {
+        if ($schema !== null) {
             $cmd = "
                 SELECT name FROM {$schema}.sqlite_master WHERE type = 'table'
                 ORDER BY name
@@ -66,13 +68,14 @@ class SqliteSchema extends AbstractSchema
      * @return Column[] An associative array where the key is the column name
      * and the value is a Column object.
      *
+     * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function fetchTableCols($spec): array
+    public function fetchTableCols(string $spec): array
     {
         [$schema, $table] = $this->getSchemaAndTable($spec);
-        $create = $this->getCreateTable($schema, $table);
+        $create = $this->getCreateTable((string)$schema, (string)$table);
         $cols = [];
-        $this->setRawCols($cols, $schema, $table, $create);
+        $this->setRawCols($cols, (string)$schema, (string)$table, $create);
         $this->convertColsToObjects($cols, $create);
         return $cols;
     }
@@ -86,7 +89,7 @@ class SqliteSchema extends AbstractSchema
      * @return array A 2-element array of schema and table.
      *
      */
-    protected function getSchemaAndTable($spec): array
+    protected function getSchemaAndTable(string $spec): array
     {
         [$schema, $table] = $this->splitName($spec);
 
@@ -112,6 +115,8 @@ class SqliteSchema extends AbstractSchema
      *
      * @return string The SQL used to create the table.
      *
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MixedReturnStatement
      */
     protected function getCreateTable($schema, $table)
     {
@@ -135,11 +140,13 @@ class SqliteSchema extends AbstractSchema
      * @param string $create The SQL used to create the table.
      *
      * @return null
-     *
+     * 
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArgument
      */
     protected function setRawCols(array &$cols, $schema, $table, $create)
     {
-        $table = $this->quoteName($table);
+        $table = $this->quoteName((string)$table);
         $raw_cols = $this->pdoFetchAll("PRAGMA {$schema}TABLE_INFO({$table})");
         foreach ($raw_cols as $val) {
             $this->addColFromRaw($cols, $val, $create);
@@ -157,12 +164,14 @@ class SqliteSchema extends AbstractSchema
      * @param string $create The SQL used to create the table.
      *
      * @return null
-     *
+     * 
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArrayOffset
      */
     protected function addColFromRaw(array &$cols, array $val, $create)
     {
         $name = $val['name'];
-        [$type, $size, $scale] = $this->getTypeSizeScope($val['type']);
+        [$type, $size, $scale] = $this->getTypeSizeScope((string)$val['type']);
 
         // find autoincrement column in CREATE TABLE sql.
         $autoinc_find = str_replace(' ', '\s+', $this->autoinc_string);
@@ -200,10 +209,11 @@ class SqliteSchema extends AbstractSchema
      *
      * @param string $create The SQL used to create the table.
      *
-     * @return null
-     *
+     * @psalm-suppress MixedArgumentTypeCoercion
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedArgument
      */
-    protected function convertColsToObjects(array &$cols, $create)
+    protected function convertColsToObjects(array &$cols, $create): void
     {
         $names = array_keys($cols);
         $last = count($names) - 1;
@@ -240,10 +250,12 @@ class SqliteSchema extends AbstractSchema
      *
      * @param string $create The SQL used to create the table.
      *
-     * @return null
-     *
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress MixedArrayAssignment
      */
-    protected function setColumnDefault(array &$cols, $name, $curr, $last, array $names, $create)
+    protected function setColumnDefault(array &$cols, $name, $curr, $last, array $names, $create): void
     {
         // For defaults using keywords, SQLite always reports the keyword
         // *value*, not the keyword itself (e.g., '2007-03-07' instead of
@@ -263,15 +275,15 @@ class SqliteSchema extends AbstractSchema
         }
 
         // look for :curr_col :curr_type . DEFAULT CURRENT_(*)
-        $find = $cols[$name]['name'] . '\s+'
-              . $cols[$name]['type']
+        $find = ((string)$cols[$name]['name']) . '\s+'
+              . ((string)$cols[$name]['type'])
               . '.*\s+DEFAULT\s+CURRENT_';
 
         // if not at the end, don't look further than the next coldef
         if ($curr < $last) {
             $next = $names[$curr + 1];
-            $find .= '.*' . $cols[$next]['name'] . '\s+'
-                   . $cols[$next]['type'];
+            $find .= '.*' . ((string)$cols[$next]['name']) . '\s+'
+                   . ((string)$cols[$next]['type']);
         }
 
         // is the default a keyword?

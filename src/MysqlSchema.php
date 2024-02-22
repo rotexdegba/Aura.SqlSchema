@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -14,10 +14,11 @@ namespace Aura\SqlSchema;
  *
  * @package Aura.SqlSchema
  *
+ * @psalm-suppress UnusedClass
  */
 class MysqlSchema extends AbstractSchema
 {
-    protected $maria = false; // if the current DB server is mariadb
+    protected bool $maria = false; // if the current DB server is mariadb
     /**
      *
      * The quote prefix for identifier names.
@@ -57,12 +58,13 @@ class MysqlSchema extends AbstractSchema
      *
      * @return string[] The list of table-names in the database.
      *
+     * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function fetchTableList($schema = null): array
+    public function fetchTableList(?string $schema = null): array
     {
         $text = 'SHOW TABLES';
-        if ($schema) {
-            $text .= ' IN ' . $this->quoteName($schema);
+        if ($schema !== null) {
+            $text .= ' IN ' . $this->quoteName(''.$schema);
         }
 
         return $this->pdoFetchCol($text);
@@ -77,18 +79,22 @@ class MysqlSchema extends AbstractSchema
      *
      * @return Column[] An associative array where the key is the column name
      * and the value is a Column object.
-     *
+     * 
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress MixedArgument
      */
-    public function fetchTableCols($spec): array
+    public function fetchTableCols(string $spec): array
     {
         [$schema, $table] = $this->splitName($spec);
         
-        $table = $this->quoteName($table);
+        $table = $this->quoteName((string)$table);
         $text = "SHOW COLUMNS FROM {$table}";
 
         if ($schema) {
             $schema = preg_replace('/[^\w]/', '', (string) $schema);
-            $schema = $this->quoteName($schema);
+            $schema = $this->quoteName((string)$schema);
             $text .= " IN {$schema}";
         }
 
@@ -102,7 +108,7 @@ class MysqlSchema extends AbstractSchema
         foreach ($raw_cols as $val) {
 
             $name = $val['Field'];
-            [$type, $size, $scale] = $this->getTypeSizeScope($val['Type']);
+            [$type, $size, $scale] = $this->getTypeSizeScope((string)$val['Type']);
             
             $default_val = $this->getDefault($val['Default'], $val['Null'] == 'YES');
             
@@ -142,18 +148,18 @@ class MysqlSchema extends AbstractSchema
      *
      * A helper method to get the default value for a column.
      *
-     * @param string $default The default value as reported by MySQL.
+     * @param mixed $default The default value as reported by MySQL.
      *
-     * @return string
+     * @return mixed
      *
      */
-    protected function getDefault($default, $nullable)
+    protected function getDefault(mixed $default, bool $nullable)
     {
         if ($this->maria && $nullable && $default === 'NULL') {
             return null;
         }
         
-        $upper = strtoupper(($default ?? ''));
+        $upper = strtoupper(($default ? ((string)$default) : ''));
         if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP' || ($this->maria && $upper == 'CURRENT_TIMESTAMP()') ) {
             // the only non-literal allowed by MySQL is "CURRENT_TIMESTAMP"
             return null;

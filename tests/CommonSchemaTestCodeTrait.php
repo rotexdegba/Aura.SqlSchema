@@ -1,5 +1,5 @@
 <?php
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -15,7 +15,7 @@ trait CommonSchemaTestCodeTrait {
         }
 
         // database setup        
-        $setup_class = 'Aura\SqlSchema\Setup\\' . ucfirst((string) $this->pdo_type) . 'Setup';
+        $setup_class = 'Rotexsoft\SqlSchema\Setup\\' . ucfirst((string) $this->pdo_type) . 'Setup';
         
         $key = str_replace('\\', '_', $setup_class);
         
@@ -101,7 +101,7 @@ trait CommonSchemaTestCodeTrait {
     public function testGetColumnFactory(): void
     {
         $actual = $this->schema->getColumnFactory();
-        $this->assertInstanceOf(\Aura\SqlSchema\ColumnFactory::class, $actual);
+        $this->assertInstanceOf(\Rotexsoft\SqlSchema\ColumnFactory::class, $actual);
     }
 
     public function testFetchTableList(): void

@@ -1,5 +1,5 @@
 <?php
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
@@ -36,7 +36,7 @@ class BaseSchemaTest extends PHPUnit_Framework_TestCase
     public function testDummy(): void
     {
         // put this one test here so that PHPUnit test runner will not generate the warning below:
-        //  'No tests found in class "Aura\SqlSchema\BaseSchemaTest".'
+        //  'No tests found in class "Rotexsoft\SqlSchema\BaseSchemaTest".'
         $this->assertTrue(true);
     }
 }

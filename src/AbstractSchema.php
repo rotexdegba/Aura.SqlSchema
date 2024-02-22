@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 use PDO;
 
@@ -44,7 +44,7 @@ abstract class AbstractSchema implements SchemaInterface
      * @param ColumnFactory $column_factory A column object factory.
      *
      */
-    public function __construct(protected \PDO $pdo, protected \Aura\SqlSchema\ColumnFactory $column_factory)
+    public function __construct(protected \PDO $pdo, protected \Rotexsoft\SqlSchema\ColumnFactory $column_factory)
     {
     }
 
@@ -69,9 +69,9 @@ abstract class AbstractSchema implements SchemaInterface
      * @return array A sequential array of the column type, size, and scale.
      *
      */
-    protected function getTypeSizeScope($spec): array
+    protected function getTypeSizeScope(string $spec): array
     {
-        $spec  = strtolower(($spec ?? ''));
+        $spec  = strtolower($spec);
         $size  = null;
         $scale = null;
 
@@ -111,13 +111,13 @@ abstract class AbstractSchema implements SchemaInterface
      * element 0 will be null and element 1 will be the name as given.
      *
      */
-    protected function splitName($name)
+    protected function splitName(string $name)
     {
-        $pos = strpos(($name ?? ''), '.');
+        $pos = strpos($name, '.');
         if ($pos === false) {
             return [null, $name];
         } else {
-            return [substr(($name ?? ''), 0, $pos), substr(($name ?? ''), $pos+1)];
+            return [substr($name, 0, $pos), substr($name, $pos+1)];
         }
     }
 
@@ -142,14 +142,14 @@ abstract class AbstractSchema implements SchemaInterface
      * @see replaceName()
      *
      */
-    public function quoteName($name): string
+    public function quoteName(string $name): string
     {
         // remove extraneous spaces
-        $name = trim(($name ?? ''));
+        $name = trim($name);
 
         // "name"."name"
         $pos = strrpos($name, '.');
-        if ($pos) {
+        if ($pos !== false) {
             $one = $this->quoteName(substr($name, 0, $pos));
             $two = $this->quoteName(substr($name, $pos + 1));
             return "{$one}.{$two}";

@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -14,6 +14,7 @@ namespace Aura\SqlSchema;
  *
  * @package Aura.SqlSchema
  *
+ * @psalm-suppress UnusedClass
  */
 class SqlsrvSchema extends AbstractSchema
 {
@@ -44,8 +45,9 @@ class SqlsrvSchema extends AbstractSchema
      *
      * @todo Honor the $schema param.
      *
+     * @psalm-suppress MixedReturnTypeCoercion
      */
-    public function fetchTableList($schema = null): array
+    public function fetchTableList(?string $schema = null): array
     {
         $text = "SELECT name FROM sysobjects WHERE type = 'U' ORDER BY name";
         return $this->pdoFetchCol($text);
@@ -63,19 +65,23 @@ class SqlsrvSchema extends AbstractSchema
      *
      * @todo Honor `schema.table` as the specification.
      *
+     * @psalm-suppress MixedArrayAccess
+     * @psalm-suppress MixedArrayOffset
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress MixedArgument
      */
-    public function fetchTableCols($spec): array
+    public function fetchTableCols(string $spec): array
     {
         // no need for $schema yet
         [, $table] = $this->splitName($spec);
 
         // get column info
-        $text = "exec sp_columns @table_name = " . $this->quoteName($table);
+        $text = "exec sp_columns @table_name = " . $this->quoteName((string)$table);
         $raw_cols = $this->pdoFetchAll($text);
 
         // get primary key info
-        $text = "exec sp_pkeys @table_owner = " . $raw_cols[0]['TABLE_OWNER']
-              . ", @table_name = " . $this->quoteName($table);
+        $text = "exec sp_pkeys @table_owner = " . ((string)$raw_cols[0]['TABLE_OWNER'])
+              . ", @table_name = " . $this->quoteName((string)$table);
         $raw_keys = $this->pdoFetchAll($text);
         $keys = [];
         foreach ($raw_keys as $row) {

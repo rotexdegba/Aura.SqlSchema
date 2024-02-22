@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -25,9 +25,9 @@ class ColumnFactory
      *
      * @param string $type The datatype of the column.
      *
-     * @param int $size The size of the column.
+     * @param int|null $size The size of the column.
      *
-     * @param int $scale The scale of the column (i.e., the number of digits
+     * @param int|null $scale The scale of the column (i.e., the number of digits
      * after the decimal point).
      *
      * @param bool $notnull Is the column defined as NOT NULL (i.e.,
@@ -50,7 +50,7 @@ class ColumnFactory
         mixed $default,
         $autoinc,
         $primary
-    ): \Aura\SqlSchema\Column {
+    ): \Rotexsoft\SqlSchema\Column {
         return new Column(
             $name,
             $type,

@@ -39,6 +39,7 @@ return static function (RectorConfig $rectorConfigurator): void {
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector::class,
         \Rector\CodeQuality\Rector\If_\CompleteMissingIfElseBracketRector::class,
         \Rector\Php54\Rector\Array_\LongArrayToShortArrayRector::class,
+        \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
         \Rector\PHPUnit\Set\PHPUnitSetList::PHPUNIT_90 => [
             __DIR__ . '/src/*.php'
         ],

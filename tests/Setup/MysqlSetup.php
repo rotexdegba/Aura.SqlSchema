@@ -1,5 +1,5 @@
 <?php
-namespace Aura\SqlSchema\Setup;
+namespace Rotexsoft\SqlSchema\Setup;
 
 class MysqlSetup extends AbstractSetup
 {

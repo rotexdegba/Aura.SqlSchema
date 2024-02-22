@@ -1,5 +1,5 @@
 <?php
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 class MysqlSchemaTest extends BaseSchemaTest
 {

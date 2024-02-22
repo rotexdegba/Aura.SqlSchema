@@ -188,6 +188,6 @@ if (count($test_results) > 0) {
     } // foreach ($test_results as $test_result)
 } // if (count($test_results) > 0)
 
-echo PHP_EOL . 'Time taken: ' . readableElapsedTime($elapsed, null, 2). PHP_EOL. PHP_EOL;
+echo PHP_EOL . 'Time taken: ' . readableElapsedTime($elapsed). PHP_EOL. PHP_EOL;
 
 echo PHP_EOL . 'Goodbye!'. PHP_EOL;

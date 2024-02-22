@@ -2,7 +2,7 @@
 spl_autoload_register(function ($class) {
 
     // the package namespace
-    $ns = 'Aura\SqlSchema';
+    $ns = 'Rotexsoft\SqlSchema';
 
     // what prefixes should be recognized?
     $prefixes = array(

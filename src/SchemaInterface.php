@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -25,9 +25,10 @@ interface SchemaInterface
      * of tables in this schema.
      *
      * @return string[] The list of table-names in the database.
-     *
+     * 
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function fetchTableList($schema = null): array;
+    public function fetchTableList(?string $schema = null): array;
 
     /**
      *
@@ -38,14 +39,16 @@ interface SchemaInterface
      *
      * @return Column[] An associative array where the key is the column name
      * and the value is a Column object.
-     *
+     * 
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function fetchTableCols($spec): array;
+    public function fetchTableCols(string $spec): array;
 
     /**
      *
      * Returns the column factory object.
      *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getColumnFactory(): ColumnFactory;
 }

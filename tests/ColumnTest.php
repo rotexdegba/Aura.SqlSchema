@@ -1,5 +1,5 @@
 <?php
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 use \PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
@@ -62,21 +62,21 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $actual = var_export($col, true);
         
         $expect = <<<EXPECT
-Aura\SqlSchema\Column::__set_state(array(
-   'notnull' => true,
-   'autoinc' => false,
-   'primary' => false,
+Rotexsoft\SqlSchema\Column::__set_state(array(
    'name' => 'cost',
    'type' => 'numeric',
    'size' => 10,
    'scale' => 2,
+   'notnull' => true,
    'default' => NULL,
+   'autoinc' => false,
+   'primary' => false,
 ))
 EXPECT;
         if (defined('HHVM_VERSION')) {
             $expect = str_replace('   ', '  ', $expect);
         }
-
+        
         // check the export
         $this->assertSame($expect, $actual);
 

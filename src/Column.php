@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
-namespace Aura\SqlSchema;
+namespace Rotexsoft\SqlSchema;
 
 /**
  *
@@ -26,30 +26,6 @@ namespace Aura\SqlSchema;
  */
 class Column
 {
-    /**
-     *
-     * Is the column marked as `NOT NULL`?
-     *
-     *
-     */
-    protected bool $notnull;
-
-    /**
-     *
-     * Is the column auto-incremented?
-     *
-     *
-     */
-    protected bool $autoinc;
-
-    /**
-     *
-     * Is the column part of the primary key?
-     *
-     *
-     */
-    protected bool $primary;
-
     /**
      *
      * Constructor.
@@ -78,46 +54,52 @@ class Column
          *
          * The name of the column.
          *
-         *
          */
-        protected $name,
+        protected string $name,
         /**
          *
          * The datatype of the column.
          *
-         *
          */
-        protected $type,
+        protected string $type,
         /**
          *
          * The size of the column; typically, this is a number of bytes or
          * characters for the column as a whole.
          *
-         *
          */
-        protected $size,
+        protected null|string|int|float $size,
         /**
          *
          * The scale of the column (i.e., the number of decimal places).
          *
-         *
          */
-        protected $scale,
-        $notnull,
+        protected null|string|int|float $scale,
+        /**
+         *
+         * Is the column marked as `NOT NULL`?
+         * 
+         */
+        protected bool $notnull,
         /**
          *
          * The default value of the column.
          *
-         *
          */
         protected mixed $default,
-        $autoinc,
-        $primary
-    ) {
-        $this->notnull  = (bool) $notnull;
-        $this->autoinc  = (bool) $autoinc;
-        $this->primary  = (bool) $primary;
-    }
+        /**
+         *
+         * Is the column auto-incremented?
+         *
+         */
+        protected bool $autoinc,
+        /**
+         *
+         * Is the column part of the primary key?
+         *
+         */
+        protected bool $primary
+    ) { }
 
     /**
      *
@@ -126,6 +108,7 @@ class Column
      * @param string $key The property name.
      *
      * @return mixed The property value.
+     * @psalm-suppress PossiblyUnusedMethod
      *
      */
     public function __get($key)
@@ -158,20 +141,21 @@ class Column
      *
      * @param array $array Column property.
      *
-     * @return object \Aura\SqlSchema\Column.
-     *
+     * @return object \Rotexsoft\SqlSchema\Column.
+     * 
+     * @psalm-suppress MixedArgument
      */
     public static function __set_state(array $array)
     {
-        return new \Aura\SqlSchema\Column(
-            $array['name'],
-            $array['type'],
+        return new \Rotexsoft\SqlSchema\Column(
+            (string) $array['name'],
+            (string) $array['type'],
             $array['size'],
             $array['scale'],
-            $array['notnull'],
+            (bool)$array['notnull'],
             $array['default'],
-            $array['autoinc'],
-            $array['primary']
+            (bool)$array['autoinc'],
+            (bool)$array['primary']
         );
     }
 }
