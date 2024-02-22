@@ -23,7 +23,6 @@ Alternatively, [download a release](https://github.com/rotexdegba/Aura.SqlSchema
 
 ### Quality
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/badges/quality-score.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/)
 [![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/badges/coverage.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.SqlSchema/)
 [![Build Status](https://travis-ci.org/auraphp/Aura.SqlSchema.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.SqlSchema)
 
@@ -55,6 +54,18 @@ These are the branches in this repository:
 
 
 There will be future branches like **rotexsoft-4.x** & the likes for versions 4.x & above.
+
+### Testing
+
+There should be a **./phpunit.xml** file if you have run the **composer update** or **composer install** command at least once.
+
+Edit the **./phpunit.xml** to contain the correct database connection info for MySql & Postgres or comment out the MySql & Postgres variables to only test against Sqlite and the run the command below to test:
+
+```
+./vendor/bin/phpunit
+```
+
+If you are running on a Linux OS with podman installed, you can run the **./run-tests-against-multiple-db-versions.php** script to do a more extensive test against multiple versions of MariaDB, MySql & Postgres.
 
 ## Getting Started
 
