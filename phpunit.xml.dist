@@ -34,11 +34,11 @@
 
     <php>
  
-        <var name="Rotexsoft_SqlSchema_Setup_MysqlSetup__dsn" value="mysql:host=127.0.0.1" />
+        <var name="Rotexsoft_SqlSchema_Setup_MysqlSetup__dsn" value="mysql:host=localhost" />
         <var name="Rotexsoft_SqlSchema_Setup_MysqlSetup__username" value="root" />
         <var name="Rotexsoft_SqlSchema_Setup_MysqlSetup__password" value="root" />
 
-        <var name="Rotexsoft_SqlSchema_Setup_PgsqlSetup__dsn" value="pgsql:host=127.0.0.1;dbname=test" />
+        <var name="Rotexsoft_SqlSchema_Setup_PgsqlSetup__dsn" value="pgsql:host=localhost" />
         <var name="Rotexsoft_SqlSchema_Setup_PgsqlSetup__username" value="postgres" />
         <var name="Rotexsoft_SqlSchema_Setup_PgsqlSetup__password" value="root" />
 
