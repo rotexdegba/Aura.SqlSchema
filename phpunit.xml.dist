@@ -49,8 +49,10 @@
         <var name="Rotexsoft_SqlSchema_Setup_SqliteSetup__username" value="" />
         <var name="Rotexsoft_SqlSchema_Setup_SqliteSetup__password" value="" />
 
+<!--
         <var name="Rotexsoft_SqlSchema_Setup_SqlsrvSetup__dsn" value="sqlsrv:Server=localhost\\SQLEXPRESS;Database=test" />
         <var name="Rotexsoft_SqlSchema_Setup_SqlsrvSetup__username" value="" />
         <var name="Rotexsoft_SqlSchema_Setup_SqlsrvSetup__password" value="" />
+-->
     </php>
 </phpunit>
