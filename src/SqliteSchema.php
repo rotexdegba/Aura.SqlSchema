@@ -144,9 +144,9 @@ class SqliteSchema extends AbstractSchema
      * @psalm-suppress MixedAssignment
      * @psalm-suppress MixedArgument
      */
-    protected function setRawCols(array &$cols, $schema, $table, $create)
+    protected function setRawCols(array &$cols, string $schema, string $table, string $create)
     {
-        $table = $this->quoteName((string)$table);
+        $table = $this->quoteName($table);
         $raw_cols = $this->pdoFetchAll("PRAGMA {$schema}TABLE_INFO({$table})");
         foreach ($raw_cols as $val) {
             $this->addColFromRaw($cols, $val, $create);
@@ -168,7 +168,7 @@ class SqliteSchema extends AbstractSchema
      * @psalm-suppress MixedAssignment
      * @psalm-suppress MixedArrayOffset
      */
-    protected function addColFromRaw(array &$cols, array $val, $create)
+    protected function addColFromRaw(array &$cols, array $val, string $create)
     {
         $name = $val['name'];
         [$type, $size, $scale] = $this->getTypeSizeScope((string)$val['type']);
