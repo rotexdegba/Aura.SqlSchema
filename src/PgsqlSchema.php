@@ -171,7 +171,7 @@ class PgsqlSchema extends AbstractSchema
 
         // string literal?
         $k = substr((string)$default, 0, 1);
-        if(($k == '"' || $k == "'") && str_contains((string)$default, '::')) {
+        if(($k === '"' || $k === "'") && str_contains((string)$default, '::')) {
             // find the trailing :: typedef
             $pos = strrpos((string)$default, '::');
             // also remove the leading and trailing quotes

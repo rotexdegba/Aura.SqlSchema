@@ -15,7 +15,7 @@ Some future work will be done to make sure it works with Microsoft Sql Server
 
 ### Installation
 
-This library requires PHP 5.3 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
+This library requires PHP 8.1 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
 
 It is installable and autoloadable via Composer as [rotexsoft/sqlschema](https://packagist.org/packages/rotexsoft/sqlschema).
 

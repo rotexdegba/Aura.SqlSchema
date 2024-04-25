@@ -160,7 +160,7 @@ class MysqlSchema extends AbstractSchema
         }
         
         $upper = strtoupper(($default ? ((string)$default) : ''));
-        if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP' || ($this->maria && $upper == 'CURRENT_TIMESTAMP()') ) {
+        if ($upper === 'NULL' || $upper === 'CURRENT_TIMESTAMP' || ($this->maria && $upper === 'CURRENT_TIMESTAMP()') ) {
             // the only non-literal allowed by MySQL is "CURRENT_TIMESTAMP"
             return null;
         } else {
