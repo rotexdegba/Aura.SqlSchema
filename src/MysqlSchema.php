@@ -34,12 +34,33 @@ class MysqlSchema extends AbstractSchema
      *
      */
     protected string $quote_name_suffix = '`';
+    
+    /**
+     * A cache to hold the results of the "SHOW VARIABLES LIKE '%version%'"
+     * query so it only gets executed once for each pdo connection injected
+     * into the constructor of this class. If multiple instances of this class
+     * are instantiated with one unique pdo object, the query will only 
+     * be run once on the first instance, the other instances will use the
+     * cached result.
+     */
+    protected static array $varsMap = [];
 
     public function __construct(\PDO $pdo, ColumnFactory $column_factory) {
         parent::__construct($pdo, $column_factory);
+                    
+        $pdoObjId = \spl_object_hash($pdo);
         
-        $vars = $pdo->query("SHOW VARIABLES LIKE '%version%'")
-                    ->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $vars = 
+            !\array_key_exists($pdoObjId, static::$varsMap)
+                ? $pdo->query("SHOW VARIABLES LIKE '%version%'")
+                      ->fetchAll(\PDO::FETCH_KEY_PAIR) // fetch values from DB
+                : static::$varsMap[$pdoObjId]; // use cached value
+        
+        // cache result for this pdo connection
+        if(!\array_key_exists($pdoObjId, static::$varsMap)) {
+
+            static::$varsMap[$pdoObjId] = $vars;
+        }
         
         if (
             isset($vars['version']) 
